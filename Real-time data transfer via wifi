@@ -1,8 +1,3 @@
-/*
-This code is written by Hanna Trojanowska
-Published on GitHub () and Medium ()
-Visit () and () for more
-*/
 
 #include <WiFi.h>
 #include <WebServer.h>
