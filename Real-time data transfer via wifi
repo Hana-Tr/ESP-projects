@@ -1,0 +1,73 @@
+/*
+This code is written by Hanna Trojanowska
+Published on GitHub () and Medium ()
+Visit () and () for more
+*/
+
+#include <WiFi.h>
+#include <WebServer.h>
+
+const char* ssid = "ESP32_AP";
+const char* password = "password123";
+const int trigPin = 5;
+const int echoPin = 18;
+
+long duration;
+float distance;
+
+#define sound_speed 0.034
+
+WebServer server(80);
+
+void handleRoot() {
+  // Measure distance and correct units
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * sound_speed / 2;
+
+  // HTML 
+  String html = "<!DOCTYPE html><html><head>";
+  html += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+  html += "<meta http-equiv=\"refresh\" content=\"1\">";  
+  html += "<style>html { font-family: Helvetica; text-align: center; }</style></head><body>";
+  html += "<h2>Distance Sensor</h2>";
+  html += "<h4>Distance: " + String(distance) + " cm</h4>";
+  html += "</body></html>";
+
+  server.send(200, "text/html", html);
+}
+
+void setup() {
+  Serial.begin(115200);
+  
+  delay(1000);
+  // Set pins' modes
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  // Start setting ESP as AP 
+    
+  WiFi.mode(WIFI_AP);
+  bool apStarted = WiFi.softAP(ssid, password);
+
+  if (apStarted) {
+    Serial.println("AP succesfull");
+  } else {
+    Serial.println("AP error");
+  }
+
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());   // should print 192.168.4.1, if does not, check if baud is 115200 or reset the board
+
+  server.on("/", handleRoot);   
+  server.begin();               
+  Serial.println("HTTP server started");
+}
+
+void loop() {
+  server.handleClient();   // handel web requests
+}
