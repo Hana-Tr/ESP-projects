@@ -44,7 +44,7 @@ void setup() {
   // Set pins' modes
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
-  // Start setting ESP as AP 
+  // Start setting ESP32 as AP 
     
   WiFi.mode(WIFI_AP);
   bool apStarted = WiFi.softAP(ssid, password);
